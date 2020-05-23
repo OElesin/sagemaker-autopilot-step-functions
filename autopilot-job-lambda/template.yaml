@@ -163,6 +163,8 @@ Resources:
             Action:
               - codebuild:StartBuild
               - codebuild:StopBuild
+              - codebuild:BatchGetBuilds
+              - codebuild:BatchGetReports
             Resource:
               - !GetAtt RestApiBuildProject.Arn
       Roles:

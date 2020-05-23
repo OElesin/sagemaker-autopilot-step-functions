@@ -19,10 +19,17 @@ def lambda_handler(event, context):
     job_status = response['AutoMLJobStatus']
     job_sec_status = response['AutoMLJobSecondaryStatus']
     print(f'Autopilot Job {autopilot_job_name} is currently in {job_status}')
-    return {
+    result = {
         'AutopilotJobName': autopilot_job_name,
         'AutopilotJobStatus': job_status,
         'AutopilotSecondaryJobStatus': job_sec_status,
         'FailureReason': response.get('FailureReason', None),
         'MachineLearningTaskType': response.get('ProblemType', None)
     }
+    if job_status == 'Completed':
+        best_candidate = response['BestCandidate']
+        selected_model = best_candidate['InferenceContainers'][0]
+        result['ModelData'] = selected_model['ModelDataUrl']
+        result['Image'] = selected_model['Image']
+        result['BestCandidateName'] = best_candidate['CandidateName']
+    return result
