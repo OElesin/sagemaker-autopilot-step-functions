@@ -1,0 +1,59 @@
+version: 0.2
+
+env:
+  variables:
+    LC_ALL: en_US.UTF-8
+    LANG: en_US.UTF-8
+    ARTIFACTS_BUCKET: galudy-visual-search-artifacts
+    S3_WORKFLOW_PREFIX: sagemaker-autopilot-step-functions-workflow
+    S3_API_PREFIX: sagemaker-autopilot-api-gateway
+    WORKFLOW_STACK_NAME: sagemaker-autopilot-ml-workflow
+    API_STACK_NAME: sagemaker-autopilot-api-gateway
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - pip install -r requirements.txt
+  pre_build:
+    commands:
+      - echo "Run AWS SAM Build on workflow stack and API stack"
+      - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
+      - export SERVICE_BUILD_ROLE=''
+      - echo "SAM package workflow template"
+      - |
+        sh -c """
+          cd autopilot-job-lambda
+          sam build -b deploy/
+          sam package --template-file deploy/template.yaml \
+                    --output-template-file packaged.template.yaml \
+                    --s3-bucket ${ARTIFACTS_BUCKET} \
+                    --s3-prefix ${S3_WORKFLOW_PREFIX}
+          """
+      - echo "SAM package REST API template"
+      - |
+        sh -c """
+        cd api-gateway
+        sam build -b deploy/
+        sam package --template-file deploy/template.yaml \
+                  --output-template-file packaged.template.yaml \
+                  --s3-bucket ${ARTIFACTS_BUCKET} \
+                  --s3-prefix ${S3_API_PREFIX}
+        """
+  build:
+    commands:
+      - echo Build started on `date`
+      - |
+        sh -c """
+        cd autopilot-job-lambda
+        sam deploy --stack-name ${WORKFLOW_STACK_NAME} \
+              --template-file packaged.template.yaml \
+              --parameter-overrides S3ApiCodePath="${ARTIFACTS_BUCKET}/${S3_API_PREFIX}" ServiceBuildRoleArn=${SERVICE_BUILD_ROLE}
+              --capabilities CAPABILITY_NAMED_IAM \
+              --no-fail-on-empty-changeset
+        """
+      - echo Done Deploying Stack
+  post_build:
+    commands:
+      - echo "Build Completed"

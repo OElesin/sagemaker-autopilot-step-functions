@@ -1,2 +1,3 @@
 boto3
 stepfunctions
+aws-sam-cli

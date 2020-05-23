@@ -5,6 +5,8 @@ Description: A sample SAM template for deploying Lambda functions.
 Parameters:
   S3ApiCodePath:
     Type: String
+  ServiceBuildRoleArn:
+    Type: String
 
 Resources:
   CreateAutopilotJobFunction:
@@ -61,13 +63,14 @@ Resources:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: AutopilotWorkflowBuild
-      ServiceRole: ''
+      ServiceRole: !Ref ServiceBuildRoleArn
       Artifacts:
         Type: NO_ARTIFACTS
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:1.0
+        PrivilegedMode: true
       Source:
         Type: GITHUB
         Location: https://github.com/OElesin/aws-samples.git
@@ -77,8 +80,8 @@ Resources:
           - - Type: EVENT
               Pattern: PUSH
             - Type: FILE_PATH
-              Pattern: '^sagemaker-autopilot-step-functions/'
-              ExcludeMatchedPattern: false
+              Pattern: 'README.md'
+              ExcludeMatchedPattern: true
       Tags:
         - Key: 'provider'
           Value: 'elesin.olalekan@gmail.com'
@@ -87,7 +90,7 @@ Resources:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: RestApiBuildProject
-      ServiceRole: ''
+      ServiceRole: !Ref ServiceBuildRoleArn
       Artifacts:
         Type: NO_ARTIFACTS
       Environment:
