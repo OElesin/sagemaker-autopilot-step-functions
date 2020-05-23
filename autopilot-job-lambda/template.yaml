@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A sample SAM template for deploying Lambda functions.
+
+Parameters:
+  S3ApiCodePath:
+    Type: String
+
+Resources:
+  CreateAutopilotJobFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      FunctionName: 'CreateAutopilotJob'
+      Description: 'Create SageMaker Autopilot Job'
+      CodeUri: create-autopilot/
+      Runtime: python3.7
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+                - lambda:InvokeAsync
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - sagemaker:CreateAutoMLJob
+                - sagemaker:CreateTrainingJob
+                - iam:PassRole
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - s3:CreateBucket
+                - s3:PutObject
+              Resource: arn:aws:s3:::sagemaker-*
+
+  CheckAutopilotJobStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      CodeUri: check-autopilot-status/
+      Runtime: python3.7
+      FunctionName: 'CheckAutopilotJobStatus'
+      Description: 'Checks SageMaker Autopilot Job Status'
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+              - lambda:InvokeAsync
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - sagemaker:DescribeAutoMLJob
+              - sagemaker:DescribeTrainingJob
+            Resource: '*'
+
+  AutopilotWorkflowBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: AutopilotWorkflowBuild
+      ServiceRole: ''
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:1.0
+      Source:
+        Type: GITHUB
+        Location: https://github.com/OElesin/aws-samples.git
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PUSH
+            - Type: FILE_PATH
+              Pattern: '^sagemaker-autopilot-step-functions/'
+              ExcludeMatchedPattern: false
+      Tags:
+        - Key: 'provider'
+          Value: 'elesin.olalekan@gmail.com'
+
+  RestApiBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: RestApiBuildProject
+      ServiceRole: ''
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:1.0
+      Source:
+        Type: S3
+        Location: !Ref S3ApiCodePath
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: 'provider'
+          Value: 'elesin.olalekan@gmail.com'
+
+  WorkflowExecRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: WorkflowExecRole
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+
+  WorkflowExecPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: 'WorkflowExecPolicy'
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: iam:PassRole
+            Resource: '*'
+            Condition:
+              StringEquals:
+                iam:PassedToService: sagemaker.amazonaws.com
+          - Effect: Allow
+            Action:
+              - events:DescribeRule
+              - events:PutRule
+              - events:PutTargets
+            Resource:
+              - arn:aws:events:*:*:rule/StepFunctionsGetEventsForSageMakerTrainingJobsRule
+          - Effect: Allow
+            Action:
+              - sagemaker:CreateModel
+              - sagemaker:DeleteEndpointConfig
+              - sagemaker:DescribeTrainingJob
+              - sagemaker:CreateEndpoint
+              - sagemaker:StopTrainingJob
+              - sagemaker:CreateTrainingJob
+              - sagemaker:UpdateEndpoint
+              - sagemaker:CreateEndpointConfig
+              - sagemaker:DeleteEndpoint
+            Resource:
+              - arn:aws:sagemaker:*:*:*
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+              - lambda:InvokeAsync
+            Resource:
+              - !GetAtt CreateAutopilotJobFunction.Arn
+              - !GetAtt CheckAutopilotJobStatusFunction.Arn
+          - Effect: Allow
+            Action:
+              - codebuild:StartBuild
+              - codebuild:StopBuild
+            Resource:
+              - !GetAtt RestApiBuildProject.Arn
+      Roles:
+        - !Ref WorkflowExecRole
+
+Outputs:
+  WorkflowExecArn:
+    Value: !GetAtt WorkflowExecRole.Arn
