@@ -15,8 +15,9 @@ def lambda_handler(event, context):
     """
     print(event)
     timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
-    autopilot_job_name = f'aws-samples-autopilot-workflow-{timestamp_suffix}'
+    default_autopilot_job_name = f'aws-samples-autopilot-workflow-{timestamp_suffix}'
     configuration: dict = event['Configuration']
+    autopilot_job_name = configuration.get('AutoMLJobName', default_autopilot_job_name)
     input_data = configuration.get('S3InputData')
     job_execution_role = configuration.get('IamRole')
     target_column = configuration.get('TargetColumnName')

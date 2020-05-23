@@ -171,3 +171,5 @@ Resources:
 Outputs:
   WorkflowExecArn:
     Value: !GetAtt WorkflowExecRole.Arn
+    Export:
+      Name: AutopilotWorkflowExecRole

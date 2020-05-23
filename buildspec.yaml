@@ -32,15 +32,6 @@ phases:
                     --s3-prefix ${S3_WORKFLOW_PREFIX}
           """
       - echo "SAM package REST API template"
-      - |
-        sh -c """
-        cd api-gateway
-        sam build -b deploy/
-        sam package --template-file deploy/template.yaml \
-                  --output-template-file packaged.template.yaml \
-                  --s3-bucket ${ARTIFACTS_BUCKET} \
-                  --s3-prefix ${S3_API_PREFIX}
-        """
   build:
     commands:
       - echo Build started on `date`
