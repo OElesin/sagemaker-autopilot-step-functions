@@ -170,6 +170,14 @@ Resources:
       Roles:
         - !Ref WorkflowExecRole
 
+  WorkflowRoleParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: AutopilotWorkflowExecRole
+      Type: String
+      Value: !GetAtt WorkflowExecRole.Arn
+      Description: 'AWS SageMaker Autopilot workflow execution role arn.'
+
 Outputs:
   WorkflowExecArn:
     Value: !GetAtt WorkflowExecRole.Arn

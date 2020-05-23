@@ -5,7 +5,8 @@ from stepfunctions.steps import LambdaStep, Wait, Choice, Task, Chain, ChoiceRul
 from stepfunctions.inputs import ExecutionInput
 from stepfunctions.workflow import Workflow
 from sagemaker.model import Model
-
+from time import gmtime, strftime
+import utils
 
 workflow_execution_role = os.getenv('WORKFLOW_EXEC_ROLE')
 sagemaker_session = sagemaker.Session()
@@ -107,11 +108,12 @@ deploy_rest_api_task = Task(
     'DeployRestAPI',
     resource='arn:aws:states:::codebuild:startBuild.sync',
     parameters={
-        'environmentVariablesOverride': [
+        'ProjectName': 'HelloBuild',
+        'EnvironmentVariablesOverride': [
             {
-                'name': 'SageMakerEndpointName',
-                'type': 'PLAIN_TEXT',
-                'value': execution_input['EndpointName']
+                'Name': 'SageMakerEndpointName',
+                'Type': 'PLAIN_TEXT',
+                'Value': execution_input['EndpointName']
             }
         ]
     }
@@ -174,18 +176,29 @@ workflow_definition = Chain([
     check_job_choice
 ])
 
-ml_workflow = Workflow(
-    name="MyCompleteMLWorkflow_v2",
+autopilot_ml_workflow = Workflow(
+    name="AutopilotStateMachineWorkflow",
     definition=workflow_definition,
-    role=workflow_execution_role
+    role=utils.get_workflow_role()
 )
 
-print(ml_workflow.get_cloudformation_template())
 
 try:
-    workflow_arn = ml_workflow.create()
+    workflow_arn = autopilot_ml_workflow.create()
 except BaseException as e:
-    print("Workflow already exists; Updating workflow")
-    workflow_arn = ml_workflow.update(workflow_definition)
+    print(e)
+    # workflow_arn = autopilot_ml_workflow.update(workflow_definition)
 
 
+timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
+# autopilot_ml_workflow.execute(
+#     inputs={
+#         'AutoMLJobName': f'autopilot-workflow-job-{timestamp_suffix}',
+#         'ModelName': f'autopilot-workflow-{timestamp_suffix}-model',
+#         'S3InputData': '',
+#         'TargetColumnName': '',
+#         'S3OutputData': '',
+#         'IamRole': '',
+#         'EndpointName': f'autopilot-workflow-{timestamp_suffix}-endpoint'
+#     }
+# )

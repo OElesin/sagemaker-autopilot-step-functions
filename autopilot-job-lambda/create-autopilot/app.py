@@ -2,7 +2,7 @@
 Amazon Step Functions Lambda Resource to create Amazon SageMaker AutoPilot job
 """
 from boto3 import client
-from time import gmtime, strftime, sleep
+from time import gmtime, strftime
 
 sm_client = client('sagemaker')
 
