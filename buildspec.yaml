@@ -45,6 +45,14 @@ phases:
               --no-fail-on-empty-changeset
         """
       - echo Done Deploying Stack
+      - echo "Deploying Step Functions State Machine"
+      - |
+        sh -c """
+        cd workflow/
+        python main.py
+        """
+      - echo "Upload REST API Code to AWS S3"
+      - aws s3 cp api-gateway "s3://${ARTIFACTS_BUCKET}/${S3_API_PREFIX}" --recursive
   post_build:
     commands:
       - echo "Build Completed"

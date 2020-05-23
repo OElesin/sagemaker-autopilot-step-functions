@@ -59,32 +59,32 @@ Resources:
               - sagemaker:DescribeTrainingJob
             Resource: '*'
 
-  AutopilotWorkflowBuildProject:
-    Type: AWS::CodeBuild::Project
-    Properties:
-      Name: AutopilotWorkflowBuild
-      ServiceRole: !Ref ServiceBuildRoleArn
-      Artifacts:
-        Type: NO_ARTIFACTS
-      Environment:
-        Type: LINUX_CONTAINER
-        ComputeType: BUILD_GENERAL1_SMALL
-        Image: aws/codebuild/standard:1.0
-        PrivilegedMode: true
-      Source:
-        Type: GITHUB
-        Location: https://github.com/OElesin/aws-samples.git
-      Triggers:
-        Webhook: true
-        FilterGroups:
-          - - Type: EVENT
-              Pattern: PUSH
-            - Type: FILE_PATH
-              Pattern: 'README.md'
-              ExcludeMatchedPattern: true
-      Tags:
-        - Key: 'provider'
-          Value: 'elesin.olalekan@gmail.com'
+#  AutopilotWorkflowBuildProject:
+#    Type: AWS::CodeBuild::Project
+#    Properties:
+#      Name: AutopilotWorkflowBuild
+#      ServiceRole: !Ref ServiceBuildRoleArn
+#      Artifacts:
+#        Type: NO_ARTIFACTS
+#      Environment:
+#        Type: LINUX_CONTAINER
+#        ComputeType: BUILD_GENERAL1_SMALL
+#        Image: aws/codebuild/standard:1.0
+#        PrivilegedMode: true
+#      Source:
+#        Type: GITHUB
+#        Location: https://github.com/OElesin/sagemaker-autopilot-step-functions.git
+#      Triggers:
+#        Webhook: true
+#        FilterGroups:
+#          - - Type: EVENT
+#              Pattern: PUSH
+#            - Type: FILE_PATH
+#              Pattern: 'README.md'
+#              ExcludeMatchedPattern: true
+#      Tags:
+#        - Key: 'provider'
+#          Value: 'elesin.olalekan@gmail.com'
 
   RestApiBuildProject:
     Type: AWS::CodeBuild::Project
@@ -177,6 +177,14 @@ Resources:
       Type: String
       Value: !GetAtt WorkflowExecRole.Arn
       Description: 'AWS SageMaker Autopilot workflow execution role arn.'
+
+  RestApiBuildProjectParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: RestApiBuildProject
+      Type: String
+      Value: !Ref RestApiBuildProject
+      Description: 'CodeBuild Project Name for deploying REST API.'
 
 Outputs:
   WorkflowExecArn:

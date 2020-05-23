@@ -1,4 +1,3 @@
-import os
 import sagemaker
 from stepfunctions.steps import LambdaStep, Wait, Choice, Task, Chain, ChoiceRule, \
     Catch, Retry, Fail, ModelStep, EndpointConfigStep, EndpointStep
@@ -8,7 +7,6 @@ from sagemaker.model import Model
 from time import gmtime, strftime
 import utils
 
-workflow_execution_role = os.getenv('WORKFLOW_EXEC_ROLE')
 sagemaker_session = sagemaker.Session()
 
 
@@ -108,7 +106,7 @@ deploy_rest_api_task = Task(
     'DeployRestAPI',
     resource='arn:aws:states:::codebuild:startBuild.sync',
     parameters={
-        'ProjectName': 'HelloBuild',
+        'ProjectName': utils.get_api_codebuild_project(),
         'EnvironmentVariablesOverride': [
             {
                 'Name': 'SageMakerEndpointName',
@@ -187,7 +185,7 @@ try:
     workflow_arn = autopilot_ml_workflow.create()
 except BaseException as e:
     print(e)
-    # workflow_arn = autopilot_ml_workflow.update(workflow_definition)
+    workflow_arn = autopilot_ml_workflow.update(workflow_definition)
 
 
 timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
