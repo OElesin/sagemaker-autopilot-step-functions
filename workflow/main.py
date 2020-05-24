@@ -1,6 +1,7 @@
 import sagemaker
 from stepfunctions.steps import LambdaStep, Wait, Choice, Task, Chain, ChoiceRule, \
     Catch, Retry, Fail, EndpointConfigStep, EndpointStep
+from boto3 import client
 from stepfunctions.inputs import ExecutionInput
 from stepfunctions.workflow import Workflow
 from time import gmtime, strftime
@@ -8,7 +9,7 @@ import utils
 
 sagemaker_session = sagemaker.Session()
 sagemaker_exec_role = utils.get_sagemaker_execution_role()
-
+sfn_client = client('stepfunctions')
 # define execution input
 execution_input = ExecutionInput(schema={
     'AutoMLJobName': str,
@@ -181,11 +182,12 @@ autopilot_ml_workflow = Workflow(
     role=utils.get_workflow_role()
 )
 
-state_machine_arn = autopilot_ml_workflow.state_machine_arn
-
-if state_machine_arn is None:
+try:
     state_machine_arn = autopilot_ml_workflow.create()
+except sfn_client.exceptions.StateMachineAlreadyExists as e:
+    print(e.message)
 else:
+    print("Updating workflow definition")
     state_machine_arn = autopilot_ml_workflow.update(workflow_definition)
 
 
