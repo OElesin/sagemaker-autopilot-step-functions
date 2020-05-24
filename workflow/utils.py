@@ -35,3 +35,20 @@ def get_sagemaker_execution_role():
         Name='SageMakerExecutionRole',
     )
     return response['Parameter']['Value']
+
+
+def save_state_machine_arn(state_machine_arn: str):
+    """
+    Save state machine ARN to Amazon SSM Parameter Store
+    :param state_machine_arn:
+    :return:
+    """
+    response = ssm_client.put_parameter(
+        Name='AutopilotStateMachineWorkflowArn',
+        Description='SageMaker Autopilot Step Function State machine ARN',
+        Value=state_machine_arn,
+        Type='String',
+        Overwrite=True
+    )
+    print(response)
+    return None

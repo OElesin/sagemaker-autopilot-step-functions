@@ -181,15 +181,19 @@ autopilot_ml_workflow = Workflow(
     role=utils.get_workflow_role()
 )
 
+state_machine_arn = autopilot_ml_workflow.state_machine_arn
 
-try:
-    workflow_arn = autopilot_ml_workflow.create()
-except BaseException as e:
-    print(e)
-    workflow_arn = autopilot_ml_workflow.update(workflow_definition)
+if state_machine_arn is None:
+    state_machine_arn = autopilot_ml_workflow.create()
+else:
+    state_machine_arn = autopilot_ml_workflow.update(workflow_definition)
 
+
+utils.save_state_machine_arn(state_machine_arn)
 
 timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
+
+# Uncomment below when you're ready to execute workflow
 # autopilot_ml_workflow.execute(
 #     inputs={
 #         'AutoMLJobName': f'autopilot-workflow-job-{timestamp_suffix}',
@@ -201,3 +205,5 @@ timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
 #         'IamRole': sagemaker_exec_role,
 #     }
 # )
+
+# TODO:

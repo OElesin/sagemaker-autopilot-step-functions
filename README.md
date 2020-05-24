@@ -55,4 +55,10 @@ Users can either provide their Pandas DataFrame or local CSV/JSON data, and the 
 get a secure REST API which they can make predictions in their applications.
 
 If you're interested in working on this together, feel free to reach out. Also feel free to extend this project as it suites 
-you. Experiencing any challenges getting started, create an issue and I will have a look as soon as I can.  
+you. Experiencing any challenges getting started, create an issue and I will have a look as soon as I can.
+
+
+### TODO
+- [ ] Add CloudWatch Schedule event trigger
+- [ ] Python Module
+- [ ] Convert project to AutoML-as-a-Service  
