@@ -1,6 +1,6 @@
 import sagemaker
 from stepfunctions.steps import LambdaStep, Wait, Choice, Task, Chain, ChoiceRule, \
-    Catch, Retry, Fail, ModelStep, EndpointConfigStep, EndpointStep
+    Catch, Retry, Fail, ModelStep, EndpointConfigStep, EndpointStep, TrainingStep
 from stepfunctions.inputs import ExecutionInput
 from stepfunctions.workflow import Workflow
 from sagemaker.model import Model
@@ -8,7 +8,7 @@ from time import gmtime, strftime
 import utils
 
 sagemaker_session = sagemaker.Session()
-
+sagemaker_exec_role = utils.get_sagemaker_execution_role()
 
 # define execution input
 execution_input = ExecutionInput(schema={
@@ -76,13 +76,15 @@ check_job_choice = Choice(
     state_id="IsAutopilotJobComplete"
 )
 
-model_step = ModelStep(
-    'SaveBestCandidateModel',
-    model_name=execution_input['ModelName'],
-    model=Model(
-        model_data=check_autopilot_job_status.output()['Payload']['ModelData'],
-        image=check_autopilot_job_status.output()['Payload']['Image']
-    )
+
+model_step = Task(
+    'CreateAutopilotModel',
+    resource='arn:aws:states:::sagemaker:createModel',
+    parameters={
+        'Containers': check_autopilot_job_status.output()['Payload']['InferenceContainers'],
+        'ModelName': execution_input['ModelName'],
+        'ExecutionRoleArn': sagemaker_exec_role
+    }
 )
 
 endpoint_config_step = EndpointConfigStep(
@@ -197,6 +199,6 @@ timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
 #         'S3InputData': '',
 #         'TargetColumnName': '',
 #         'S3OutputData': '',
-#         'IamRole': '',
+#         'IamRole': sagemaker_exec_role,
 #     }
 # )
