@@ -193,7 +193,7 @@ utils.save_state_machine_arn(state_machine_arn)
 
 timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
 
-# Uncomment below when you're ready to execute workflow
+# Uncomment below when you're ready to execute workflow on deployment
 # autopilot_ml_workflow.execute(
 #     inputs={
 #         'AutoMLJobName': f'autopilot-workflow-job-{timestamp_suffix}',
@@ -206,4 +206,3 @@ timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
 #     }
 # )
 
-# TODO:

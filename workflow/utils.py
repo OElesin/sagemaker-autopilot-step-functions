@@ -1,6 +1,4 @@
 import boto3
-from sagemaker.model import Model
-from sagemaker.pipeline import PipelineModel
 
 
 ssm_client = boto3.client('ssm')
@@ -52,3 +50,12 @@ def save_state_machine_arn(state_machine_arn: str):
     )
     print(response)
     return None
+
+
+def save_execution_input(execution_input: str):
+    """
+    Save state machine input to Amazon SSM Parameter Store
+    :param execution_input:
+    :return:
+    """
+    return
