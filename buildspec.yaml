@@ -15,7 +15,7 @@ phases:
     commands:
       - apt-get update
       - apt-get install libblas-dev  liblapack-dev -y
-      - pip install --upgrade pip
+      - pip install --upgrade pip boto3
       - pip install stepfunctions aws-sam-cli
   pre_build:
     commands:
