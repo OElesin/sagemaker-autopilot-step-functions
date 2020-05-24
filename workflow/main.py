@@ -1,9 +1,8 @@
 import sagemaker
 from stepfunctions.steps import LambdaStep, Wait, Choice, Task, Chain, ChoiceRule, \
-    Catch, Retry, Fail, ModelStep, EndpointConfigStep, EndpointStep, TrainingStep
+    Catch, Retry, Fail, EndpointConfigStep, EndpointStep
 from stepfunctions.inputs import ExecutionInput
 from stepfunctions.workflow import Workflow
-from sagemaker.model import Model
 from time import gmtime, strftime
 import utils
 
