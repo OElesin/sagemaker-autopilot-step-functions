@@ -15,14 +15,14 @@ phases:
     runtime-versions:
       python: 3.7
     commands:
-      - sudo apt-get install libblas-dev  liblapack-dev
+      - apt-get install libblas-dev  liblapack-dev
       - pip install --upgrade pip
       - pip install stepfunctions aws-sam-cli
   pre_build:
     commands:
       - echo "Run AWS SAM Build on workflow stack and API stack"
       - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
-      - export SERVICE_BUILD_ROLE=''
+      - export SERVICE_BUILD_ROLE="arn:aws:iam::${AWS_ACCOUNT_ID}:role/service-role/codebuild-Attires24-App-service-role"
       - echo "SAM package workflow template"
       - |
         sh -c """
