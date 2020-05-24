@@ -2,8 +2,6 @@ version: 0.2
 
 env:
   variables:
-    LC_ALL: en_US.UTF-8
-    LANG: en_US.UTF-8
     ARTIFACTS_BUCKET: galudy-visual-search-artifacts
     S3_WORKFLOW_PREFIX: sagemaker-autopilot-step-functions-workflow
     S3_API_PREFIX: sagemaker-autopilot-api-gateway
@@ -43,7 +41,7 @@ phases:
         cd autopilot-job-lambda
         sam deploy --stack-name ${WORKFLOW_STACK_NAME} \
               --template-file packaged.template.yaml \
-              --parameter-overrides S3ApiCodePath="${ARTIFACTS_BUCKET}/${S3_API_PREFIX}" ServiceBuildRoleArn=${SERVICE_BUILD_ROLE}
+              --parameter-overrides S3ApiCodePath="${ARTIFACTS_BUCKET}/${S3_API_PREFIX}" ServiceBuildRoleArn=${SERVICE_BUILD_ROLE} \
               --capabilities CAPABILITY_NAMED_IAM \
               --no-fail-on-empty-changeset
         """
