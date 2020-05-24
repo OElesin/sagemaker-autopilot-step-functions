@@ -15,6 +15,11 @@ phases:
     runtime-versions:
       python: 3.7
     commands:
+      - |
+        add-apt-repository main
+        add-apt-repository universe
+        add-apt-repository restricted
+        add-apt-repository multiverse
       - apt-get install libblas-dev  liblapack-dev
       - pip install --upgrade pip
       - pip install stepfunctions aws-sam-cli
