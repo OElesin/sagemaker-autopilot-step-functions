@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Template for gram2shop-backend
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+
+Parameters:
+  SageMakerEndpoint:
+    Type: String
+
+
+Resources:
+  SageMakerInferenceApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: code/
+      Handler: app.lambda_handler
+      Runtime: python3.7
+      Environment:
+        Variables:
+          SAGEMAKER_ENDPOINT: !Ref SageMakerEndpoint
+      Events:
+        Request:
+          Type: Api
+          Properties:
+            Path: /predictions
+            Method: POST
+        Options:
+          Type: Api
+          Properties:
+            Path: /predictions
+            Method: OPTIONS
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - sagemaker:InvokeEndpoint
+            Resource: !Sub 'arn:aws:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/${SageMakerEndpoint}'
+
+
+Outputs:
+  SageMakerInferenceApi:
+    Description: "API Gateway endpoint URL for Prod stage for ExtractRichMediaFunctionApi function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/predictions"
