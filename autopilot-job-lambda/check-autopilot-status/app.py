@@ -28,8 +28,6 @@ def lambda_handler(event, context):
     }
     if job_status == 'Completed':
         best_candidate = response['BestCandidate']
-        selected_model = best_candidate['InferenceContainers'][0]
-        result['ModelData'] = selected_model['ModelDataUrl']
-        result['Image'] = selected_model['Image']
+        result['InferenceContainers'] = best_candidate['InferenceContainers']
         result['BestCandidateName'] = best_candidate['CandidateName']
     return result

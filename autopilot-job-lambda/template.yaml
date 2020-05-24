@@ -125,6 +125,24 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchEventsFullAccess
 
+  SageMakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: SageMakerExecutionRole
+      Path: '/service-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+
   WorkflowExecPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -181,7 +199,7 @@ Resources:
       Name: AutopilotWorkflowExecRole
       Type: String
       Value: !GetAtt WorkflowExecRole.Arn
-      Description: 'AWS SageMaker Autopilot workflow execution role arn.'
+      Description: 'AWS SageMaker Autopilot Step Functions workflow execution role arn.'
 
   RestApiBuildProjectParameter:
     Type: AWS::SSM::Parameter
@@ -190,6 +208,14 @@ Resources:
       Type: String
       Value: !Ref RestApiBuildProject
       Description: 'CodeBuild Project Name for deploying REST API.'
+
+  SageMakerExecutionRoleParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SageMakerExecutionRole
+      Type: String
+      Value: !GetAtt SageMakerExecutionRole.Arn
+      Description: 'AWS SageMaker execution role arn.'
 
 Outputs:
   WorkflowExecArn:
