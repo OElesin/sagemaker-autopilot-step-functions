@@ -91,6 +91,7 @@ Resources:
     Properties:
       Name: RestApiBuildProject
       ServiceRole: !Ref ServiceBuildRoleArn
+      BadgeEnabled: true
       Artifacts:
         Type: NO_ARTIFACTS
       Environment:
@@ -98,8 +99,9 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:1.0
       Source:
-        Type: S3
-        Location: !Ref S3ApiCodePath
+        Type: GITHUB
+        Location: https://github.com/OElesin/sagemaker-autopilot-step-functions.git
+        BuildSpec: buildspec_deploy_api.yaml
       TimeoutInMinutes: 10
       Tags:
         - Key: 'provider'

@@ -109,7 +109,7 @@ deploy_rest_api_task = Task(
         'ProjectName': utils.get_api_codebuild_project(),
         'EnvironmentVariablesOverride': [
             {
-                'Name': 'SageMakerEndpointName',
+                'Name': 'SAGEMAKER_ENDPOINT',
                 'Type': 'PLAIN_TEXT',
                 'Value': execution_input['EndpointName']
             }
@@ -193,10 +193,10 @@ timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
 #     inputs={
 #         'AutoMLJobName': f'autopilot-workflow-job-{timestamp_suffix}',
 #         'ModelName': f'autopilot-workflow-{timestamp_suffix}-model',
+#         'EndpointName': f'autopilot-workflow-{timestamp_suffix}-endpoint',
 #         'S3InputData': '',
 #         'TargetColumnName': '',
 #         'S3OutputData': '',
 #         'IamRole': '',
-#         'EndpointName': f'autopilot-workflow-{timestamp_suffix}-endpoint'
 #     }
 # )
