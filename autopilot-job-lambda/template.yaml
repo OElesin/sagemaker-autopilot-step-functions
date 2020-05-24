@@ -122,6 +122,8 @@ Resources:
             Principal:
               Service:
                 - states.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchEventsFullAccess
 
   WorkflowExecPolicy:
     Type: AWS::IAM::Policy
@@ -141,7 +143,7 @@ Resources:
               - events:PutRule
               - events:PutTargets
             Resource:
-              - arn:aws:events:*:*:rule/StepFunctionsGetEventsForSageMakerTrainingJobsRule
+              - !Sub arn:aws:events:${AWS::Region}:${AWS::AccountId}:rule/StepFunctionsGetEventsForSageMakerTrainingJobsRule
           - Effect: Allow
             Action:
               - sagemaker:CreateModel
