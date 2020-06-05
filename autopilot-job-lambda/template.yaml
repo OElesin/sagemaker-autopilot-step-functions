@@ -89,7 +89,7 @@ Resources:
             Action:
               - states:StartExecution
             Resource: '*'
-#      Events: # uncomment when deploying to production
+#      Events: # uncomment for production deployment
 #        JobSchedule:
 #          Type: Schedule
 #          Properties:
