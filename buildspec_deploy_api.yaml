@@ -41,3 +41,6 @@ phases:
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset
         """
+  post_build:
+    commands:
+      - echo "Build Completed"
