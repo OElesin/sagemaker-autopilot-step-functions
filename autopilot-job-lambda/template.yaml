@@ -3,9 +3,13 @@ Transform: AWS::Serverless-2016-10-31
 Description: A sample SAM template for deploying Lambda functions.
 
 Parameters:
-  S3ApiCodePath:
-    Type: String
   ServiceBuildRoleArn:
+    Type: String
+  S3InputDataPath:
+    Type: String
+  TargetColumnName:
+    Type: String
+  S3OutputPath:
     Type: String
 
 Resources:
@@ -59,6 +63,41 @@ Resources:
               - sagemaker:DescribeTrainingJob
             Resource: '*'
 
+  StateMachineWorkflowTriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      CodeUri: workflow-trigger/
+      Runtime: python3.7
+      FunctionName: 'StateMachineWorkflowTrigger'
+      Description: 'Lambda function to trigger workflow on schedule'
+      Environment:
+        Variables:
+          SAGEMAKER_EXECUTION_ROLE: !GetAtt SageMakerExecutionRole.Arn
+          S3_INPUT_DATA_PATH: !Ref S3InputDataPath
+          S3_OUTPUT_PATH: !Ref S3OutputPath
+          TARGET_COLUMN_NAME: !Ref TargetColumnName
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - lambda:InvokeFunction
+              - lambda:InvokeAsync
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - states:StartExecution
+            Resource: '*'
+#      Events: # uncomment for production deployment
+#        JobSchedule:
+#          Type: Schedule
+#          Properties:
+#            Schedule: 'rate(14 days)'
+#            Name: CD4AutoMLSchedule
+#            Description: test schedule
+#            Enabled: False
+
 #  AutopilotWorkflowBuildProject:
 #    Type: AWS::CodeBuild::Project
 #    Properties:
@@ -79,6 +118,8 @@ Resources:
 #        FilterGroups:
 #          - - Type: EVENT
 #              Pattern: PUSH
+#            - Type: HEAD_REF
+#              Pattern: '^refs/heads/master$'
 #            - Type: FILE_PATH
 #              Pattern: 'README.md'
 #              ExcludeMatchedPattern: true

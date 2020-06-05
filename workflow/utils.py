@@ -1,7 +1,4 @@
 import boto3
-from sagemaker.model import Model
-from sagemaker.pipeline import PipelineModel
-
 
 ssm_client = boto3.client('ssm')
 
@@ -52,3 +49,4 @@ def save_state_machine_arn(state_machine_arn: str):
     )
     print(response)
     return None
+

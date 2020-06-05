@@ -59,6 +59,6 @@ you. Experiencing any challenges getting started, create an issue and I will hav
 
 
 ### TODO
-- [ ] Add CloudWatch Schedule event trigger
+- [X] Add CloudWatch Schedule event trigger
 - [ ] Python Module
 - [ ] Convert project to AutoML-as-a-Service  
