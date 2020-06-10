@@ -9,12 +9,15 @@ Parameters:
   S3InputDataPath:
     Type: String
     Description: 'AWS S3 Input data path for SageMaker Autopilot model training'
+    Default: 'Unknown'
   TargetColumnName:
     Type: String
     Description: 'Name of the target column to predict with SageMaker Autopilot'
+    Default: 'Unknown'
   S3OutputPath:
     Type: String
     Description: 'S3 Path to save SageMaker Autopilot model artifacts'
+    Default: 'Unknown'
   DeployedModelName:
     Type: String
     Description: |
