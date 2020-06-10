@@ -5,6 +5,7 @@ from boto3 import client
 from stepfunctions.inputs import ExecutionInput
 from stepfunctions.workflow import Workflow
 from time import gmtime, strftime
+from sagemaker.model_monitor import DataCaptureConfig
 import utils
 
 sagemaker_session = sagemaker.Session()
@@ -92,7 +93,11 @@ endpoint_config_step = EndpointConfigStep(
     endpoint_config_name=execution_input['ModelName'],
     model_name=execution_input['ModelName'],
     initial_instance_count=1,
-    instance_type='ml.m4.xlarge'
+    instance_type='ml.m4.xlarge',
+    data_capture_config=DataCaptureConfig(
+        enable_capture=True,
+        sampling_percentage=100,
+    )
 )
 
 
