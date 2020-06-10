@@ -28,6 +28,17 @@ def lambda_handler(event, context):
     }
     if job_status == 'Completed':
         best_candidate = response['BestCandidate']
-        result['InferenceContainers'] = best_candidate['InferenceContainers']
+        inference_containers = best_candidate['InferenceContainers']
+        multi_model_inference_containers = list(map(_set_multimodel_mode, inference_containers))
+        result['InferenceContainers'] = multi_model_inference_containers
         result['BestCandidateName'] = best_candidate['CandidateName']
     return result
+
+
+def _set_multimodel_mode(inference_container: dict) -> dict:
+    """
+    :param inference_container:
+    :return:
+    """
+    inference_container['Mode'] = 'MultiModel'
+    return inference_container
