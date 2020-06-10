@@ -11,6 +11,9 @@ Globals:
 Parameters:
   SageMakerEndpoint:
     Type: String
+  SageMakerAutopilotTargetModel:
+    Type: String
+    Description: 'Model to invoke in multi-model endpoint'
 
 
 Resources:
@@ -23,6 +26,7 @@ Resources:
       Environment:
         Variables:
           SAGEMAKER_ENDPOINT: !Ref SageMakerEndpoint
+          SAGEMAKER_AUTOPILOT_TARGET_MODEL: !Ref SageMakerAutopilotTargetModel
       Events:
         Request:
           Type: Api

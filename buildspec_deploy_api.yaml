@@ -37,7 +37,7 @@ phases:
         cd api-gateway
         sam deploy --stack-name ${API_STACK_NAME} \
             --template-file packaged.template.yaml \
-            --parameter-overrides SageMakerEndpoint=${SAGEMAKER_ENDPOINT} \
+            --parameter-overrides SageMakerEndpoint=${SAGEMAKER_ENDPOINT} SageMakerAutopilotTargetModel=${SAGEMAKER_AUTOPILOT_TARGET_MODEL} \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset
         """

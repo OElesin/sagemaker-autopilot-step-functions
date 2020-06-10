@@ -5,12 +5,22 @@ Description: A sample SAM template for deploying Lambda functions.
 Parameters:
   ServiceBuildRoleArn:
     Type: String
+    Description: 'IAM Role to be assumed by CodeBuild to run jobs'
   S3InputDataPath:
     Type: String
+    Description: 'AWS S3 Input data path for SageMaker Autopilot model training'
   TargetColumnName:
     Type: String
+    Description: 'Name of the target column to predict with SageMaker Autopilot'
   S3OutputPath:
     Type: String
+    Description: 'S3 Path to save SageMaker Autopilot model artifacts'
+  DeployedModelName:
+    Type: String
+    Description: |
+      SageMaker Autopilot model name. This should be unique per account. The name is used for multi-model endpoint
+      deployment
+    Default: 'default-autopilot-workflow-model'
 
 Resources:
   CreateAutopilotJobFunction:
@@ -77,6 +87,7 @@ Resources:
           S3_INPUT_DATA_PATH: !Ref S3InputDataPath
           S3_OUTPUT_PATH: !Ref S3OutputPath
           TARGET_COLUMN_NAME: !Ref TargetColumnName
+          DEPLOYED_MODEL_NAME: !Ref DeployedModelName
       Policies:
         Version: '2012-10-17'
         Statement:
@@ -257,6 +268,14 @@ Resources:
       Type: String
       Value: !GetAtt SageMakerExecutionRole.Arn
       Description: 'AWS SageMaker execution role arn.'
+
+  SageMakerAutopilotModelName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: SageMakerAutopilotModelName
+      Type: String
+      Value: !Ref DeployedModelName
+      Description: 'SageMaker Autopilot model name. This should be unique per account. The name is used for multi-model endpoint deployment'
 
 Outputs:
   WorkflowExecArn:

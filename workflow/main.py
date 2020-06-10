@@ -90,7 +90,7 @@ model_step = Task(
 
 endpoint_config_step = EndpointConfigStep(
     'CreateModelEndpointConfig',
-    endpoint_config_name=execution_input['ModelName'],
+    endpoint_config_name=execution_input['EndpointName'],
     model_name=execution_input['ModelName'],
     initial_instance_count=1,
     instance_type='ml.m4.xlarge',
@@ -119,6 +119,11 @@ deploy_rest_api_task = Task(
                 'Name': 'SAGEMAKER_ENDPOINT',
                 'Type': 'PLAIN_TEXT',
                 'Value': execution_input['EndpointName']
+            },
+            {
+                'Name': 'SAGEMAKER_AUTOPILOT_TARGET_MODEL',
+                'Type': 'PLAIN_TEXT',
+                'Value': '{}.tar.gz'.format(execution_input['ModelName'])
             }
         ]
     }
