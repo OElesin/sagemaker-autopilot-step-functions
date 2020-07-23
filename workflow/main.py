@@ -20,7 +20,9 @@ execution_input = ExecutionInput(schema={
     'TargetColumnName': str,
     'S3OutputData': str,
     'Tags': dict,
-    'EndpointName': str
+    'EndpointName': str,
+    'EndpointConfigName': str
+    
 })
 
 # TODO: make this a notification
@@ -90,7 +92,7 @@ model_step = Task(
 
 endpoint_config_step = EndpointConfigStep(
     'CreateModelEndpointConfig',
-    endpoint_config_name=execution_input['EndpointName'],
+    endpoint_config_name=execution_input['EndpointConfigName'],    
     model_name=execution_input['ModelName'],
     initial_instance_count=1,
     instance_type='ml.m4.xlarge',
@@ -104,7 +106,7 @@ endpoint_config_step = EndpointConfigStep(
 endpoint_step = EndpointStep(
     'UpdateModelEndpoint',
     endpoint_name=execution_input['EndpointName'],
-    endpoint_config_name=execution_input['ModelName'],
+    endpoint_config_name=execution_input['EndpointConfigName'],
     update=False
 )
 
@@ -210,6 +212,7 @@ timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
 #     inputs={
 #         'AutoMLJobName': f'autopilot-workflow-job-{timestamp_suffix}',
 #         'ModelName': f'autopilot-workflow-{timestamp_suffix}-model',
+#         'EndpointConfigName': f'autopilot-workflow-{timestamp_suffix}-endpoint-config',
 #         'EndpointName': f'autopilot-workflow-{timestamp_suffix}-endpoint',
 #         'S3InputData': '',
 #         'TargetColumnName': '',
