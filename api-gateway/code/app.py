@@ -39,5 +39,8 @@ def lambda_handler(event, context):
         Body=request_body,
         TargetModel=SAGEMAKER_AUTOPILOT_TARGET_MODEL
     )
-    payload = {'prediction': response['Body'].read().decode("utf-8")}
+    payload = {
+        'Prediction': response['Body'].read().decode("utf-8"),
+        'SageMakerEndpointName': SAGEMAKER_ENDPOINT
+    }
     return respond(payload, 200)
