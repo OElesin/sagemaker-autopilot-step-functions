@@ -22,7 +22,7 @@ execution_input = ExecutionInput(schema={
     'Tags': dict,
     'EndpointName': str,
     'EndpointConfigName': str
-    
+
 })
 
 # TODO: make this a notification
@@ -92,7 +92,7 @@ model_step = Task(
 
 endpoint_config_step = EndpointConfigStep(
     'CreateModelEndpointConfig',
-    endpoint_config_name=execution_input['EndpointConfigName'],    
+    endpoint_config_name=execution_input['EndpointConfigName'],
     model_name=execution_input['ModelName'],
     initial_instance_count=1,
     instance_type='ml.m4.xlarge',
@@ -206,18 +206,4 @@ else:
 utils.save_state_machine_arn(state_machine_arn)
 
 timestamp_suffix = strftime('%d-%H-%M-%S', gmtime())
-
-# Uncomment below when you're ready to execute workflow on deployment
-# autopilot_ml_workflow.execute(
-#     inputs={
-#         'AutoMLJobName': f'autopilot-workflow-job-{timestamp_suffix}',
-#         'ModelName': f'autopilot-workflow-{timestamp_suffix}-model',
-#         'EndpointConfigName': f'autopilot-workflow-{timestamp_suffix}-endpoint-config',
-#         'EndpointName': f'autopilot-workflow-{timestamp_suffix}-endpoint',
-#         'S3InputData': '',
-#         'TargetColumnName': '',
-#         'S3OutputData': '',
-#         'IamRole': sagemaker_exec_role,
-#     }
-# )
 
